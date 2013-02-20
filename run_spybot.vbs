@@ -13,6 +13,6 @@ objFile.Write "Running Spybot" & nl
 
 Set objShell = CreateObject("WScript.Shell")
 q = """"
-strCmd = "cmd.exe /K  C:\" & q & "Program Files (x86)" & q & "\Spybot\SpybotSD.exe /autocheck"
-objShell.Run(strCmd)
+strCmd = "cmd.exe /C  C:\" & q & "Program Files (x86)" & q & "\Spybot\SpybotSD.exe /autocheck"
+objShell.Run strCmd, 0, true
 objFile.Write "Spybot Running..." & nl
