@@ -15,6 +15,16 @@ Set objLogicalDisk = objWMIService.Get("Win32_LogicalDisk.DeviceID='c:'")
 FreeMegaBytes = objLogicalDisk.FreeSpace / GB
 TotalSpace = objLogicalDisk.Size / GB
 FSType = objLogicalDisk.Filesystem
+HDCaption = objLogicalDisk.Caption
+HDDescription = objLogicalDisk.Description
+HDDeviceID = objLogicalDisk.DeviceID
+HDLastError = objLogicalDisk.LastErrorCode
+HDStatus = objLogicalDisk.Status
+HDVolumeDirty = objLogicalDisk.VolumeDirty
+HDVolumeName = objLogicalDisk.VolumeName
+HDSN = objLogicalDisk.VolumeSerialNumber
+
+
 
 msgbox "Obtaining CPU statistics..."
 'GET CPU USAGE' 'Weird bug when CPU usage is at 0%. It returns a null value instead of a 0 and breaks the average calculation.'
@@ -184,9 +194,17 @@ Set colLoggedEvents = objWMIService.ExecQuery _
 Objfile.Writeline "          SYSTEM STATISTICS"
 Objfile.Writeline ""
 objFile.WriteLine "Hard drive info "
+objFile.WriteLine "     DeviceID: " & HDDeviceID
 objFile.WriteLine "     File System: " & FSType
 objFile.WriteLine "     Total Hard Drive Size: " & Int(TotalSpace) & " GB"
 objFile.WriteLine "     Free space: " & Int(FreeMegabytes) & " GB"
+objFile.WriteLine "     Caption: " & HDCaption
+objFile.WriteLine "     Description: " & HDDescription
+objFile.WriteLine "     Last Error Code: " & HDLastError
+objFile.WriteLine "     Current Status: " & HSStatus
+objFile.WriteLine "     Need a Disk Check? " & HDVolumeDirty
+objFile.WriteLine "     VolumeName: " & HDVolumeName
+objFile.WriteLine "     SerialNumber: " & HDSN
 Objfile.Writeline ""
 ObjFile.Writeline "CPU Usage Stats:"
 ObjFile.WriteLine "     CPU TOTAL: " & CPUtotal 
