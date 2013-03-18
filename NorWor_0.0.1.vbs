@@ -63,9 +63,42 @@ Set objWMIService = GetObject("winmgmts:" _
     & "{impersonationLevel=impersonate}!\\" _
     & strComputer & "\root\cimv2")
 
+'	'CALCULATES AVG MEM USE'
+
+Set MemRefresherObject = CreateObject("WbemScripting.SWbemRefresher")
+Set MemoryObjects = _
+	MemRefresherObject.Addenum(objWMIService, "Win32_OperatingSystem", "Win32_ComputerSystem").ObjectSet
+MemRefresherObject.Refresh
+
+ObjFile.Writeline "Mem AVG"
+
+For i = 1 to Samples
+	RefresherObject.Refresh
+	Set colSettings = objWMIService.ExecQuery ("Select * from Win32_OperatingSystem")
+	For Each objOperatingSystem in colSettings 
+		freeMem = objOperatingSystem.FreePhysicalMemory
+	Next
+
+	Set colSettings = objWMIService.ExecQuery ("Select * from Win32_ComputerSystem")
+	
+	For Each objOperatingSystem in colSettings 
+		totalMem = objOperatingSystem.TotalPhysicalMemory / 1024
+	Next
+	memSample = Round((totalMem - freeMem) / totalMem * 100)
+	ObjFile.WriteLine "     Sample " & i & " " & "Mem usage: " & memSample & "%"
+	If (IsNull(memSample)) then
+		MemUseTotal = MemUsetotal
+	else
+		MemUsetotal = MemUsetotal + memSample
+	end if	
+Next
+MemAvg = memUseTotal / Samples
+'	'END MEM AVG'
+
 Set colSettings = objWMIService.ExecQuery _
     ("Select * from Win32_OperatingSystem")
-	
+
+
 For Each objOperatingSystem in colSettings 
     freeMem = objOperatingSystem.FreePhysicalMemory
 Next
@@ -162,6 +195,8 @@ if ( CurrentProfiles AND NET_FW_PROFILE2_DOMAIN ) then
    else
       DomainProfStatus = "     Firewall is OFF on domain profile."
    end if
+else
+    DomainProfStatus = "0"
 end if
 
 if ( CurrentProfiles AND NET_FW_PROFILE2_PRIVATE ) then
@@ -170,6 +205,8 @@ if ( CurrentProfiles AND NET_FW_PROFILE2_PRIVATE ) then
    else
       PrivateProfStatus = "     Firewall is OFF on private profile."
    end if
+else
+    PrivateProfStatus = "0"
 end if
 
 if ( CurrentProfiles AND NET_FW_PROFILE2_PUBLIC ) then
@@ -178,6 +215,8 @@ if ( CurrentProfiles AND NET_FW_PROFILE2_PUBLIC ) then
    else
       PublicProfStatus = "     Firewall is OFF on public profile."
    end if
+else
+    PublicProfStatus = "0"
 end if
 
 
@@ -214,6 +253,7 @@ objFile.WriteLine "Memory Statistics"
 objFile.Writeline "     Free Physical memory: " & Round(freeMem / kbGB,1) & " GB"
 objFile.Writeline "     Total Physical Memory: " & Round(totalMem / kbGB,1) & " GB"
 objFile.Writeline "     Memory Usage: " & Round((totalMem - freeMem) / totalMem * 100) & "%"
+objFile.Writeline "     Average Memory Usage: " & memAvg
 objFile.WriteLine "     Availible memory: " & AvailableGB & " GB"
 objFile.WriteLine "     Commit Limit: " & CommitLimit & " GB"
 objFile.WriteLine "     Committed memory: " & CommittedGB & " GB"
@@ -236,7 +276,15 @@ objFile.WriteLine "     Serial Number: " & SerialNumber
 objFile.WriteLine "     Version: " & Version
 Objfile.Writeline ""
 objfile.WriteLine "Firewall Status"
-objfile.WriteLine DomainProfStatus & PrivateProfStatus & PublicProfStatus 'this is a bad way to do this and is a temporary measure'
+if (DomainProfStatus <> "0") then
+   objfile.WriteLine DomainProfStatus
+end if   
+if (PrivateProfStatus <> "0") then
+   objfile.WriteLine PrivateProfStatus
+end if   
+if (PublicProfStatus <> "0") then
+   objfile.WriteLine PublicProfStatus
+end if   
 Objfile.Writeline ""
 objFile.Writeline "Unexpected shutdowns: " & colLoggedEvents.Count
 
