@@ -27,7 +27,7 @@ HDSN = objLogicalDisk.VolumeSerialNumber
 
 
 msgbox "Obtaining CPU statistics..."
-'GET CPU USAGE' 'Weird bug when CPU usage is at 0%. It returns a null value instead of a 0 and breaks the average calculation.'
+'GET CPU USAGE' 
 Samples = 5
 CPUtotal = 0
 Set RefresherObject = CreateObject("WbemScripting.SWbemRefresher")
@@ -66,14 +66,13 @@ Set objWMIService = GetObject("winmgmts:" _
 '	'CALCULATES AVG MEM USE'
 
 Set MemRefresherObject = CreateObject("WbemScripting.SWbemRefresher")
-Set MemoryObjects = _
-	MemRefresherObject.Addenum(objWMIService, "Win32_OperatingSystem", "Win32_ComputerSystem").ObjectSet
+Set MemoryObjects = MemRefresherObject.Addenum(objWMIService, "Win32_OperatingSystem").ObjectSet
 MemRefresherObject.Refresh
 
 ObjFile.Writeline "Mem AVG"
 
 For i = 1 to Samples
-	RefresherObject.Refresh
+	MemRefresherObject.Refresh
 	Set colSettings = objWMIService.ExecQuery ("Select * from Win32_OperatingSystem")
 	For Each objOperatingSystem in colSettings 
 		freeMem = objOperatingSystem.FreePhysicalMemory
@@ -93,6 +92,7 @@ For i = 1 to Samples
 	end if	
 Next
 MemAvg = memUseTotal / Samples
+objfile.Writeline ""
 '	'END MEM AVG'
 
 Set colSettings = objWMIService.ExecQuery _
@@ -151,16 +151,40 @@ For Each os in oss 											'Most of these are unnecessary but I'm leaving the
     RegisteredUser = os.RegisteredUser
     SerialNumber = os.SerialNumber
     Version = os.Version
+	SPmajor = os.ServicePackMajorVersion
+	SPminor = os.ServicePackMinorVersion
+	InstallDate = os.InstallDate
 Next
 
+'Operating system test' 
+' Right now this just prints the OS in the log but this test could be placed earlier and used to determine script behavior based on OS'
+strOS = " "
+strComputer = "."
+Set objWMIService = GetObject("winmgmts:" _
+    & "{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
+
+Set colOperatingSystems = objWMIService.ExecQuery _
+    ("Select * from Win32_OperatingSystem")
+
+For Each objOperatingSystem in colOperatingSystems
+    strOS= objOperatingSystem.Caption
+Next
+if instr(strOS,"7") then strOS = "Windows 7"
+if instr(strOS,"Vista") then strOS = "Windows Vista"
+if instr(strOS,"XP") then strOS = "Windows XP"
+
+IF GetObject("winmgmts:root\cimv2:Win32_Processor='cpu0'").AddressWidth  = 64 THEN
+strOS= strOS & " 64 bit"  
+else
+
+strOS= strOS & " 32 bit"
+END IF
 
 
 msgbox "Testing for firewall..."
 
 
 'Firewall test'
-'(I straight up borrowed this from somewhere, I'll need to see if I can peel the unnecessary bits off of it and make it less of a huge thing)'
-
 
 
 Dim CurrentProfiles
@@ -241,7 +265,9 @@ objFile.WriteLine "     Caption: " & HDCaption
 objFile.WriteLine "     Description: " & HDDescription
 objFile.WriteLine "     Last Error Code: " & HDLastError
 objFile.WriteLine "     Current Status: " & HSStatus
-objFile.WriteLine "     Need a Disk Check? " & HDVolumeDirty
+If (HDVolumeDirty = TRUE) then
+	objFile.WriteLine "     Warning! Your Harddrive needs to be cleaned. You should run disk check."
+end if
 objFile.WriteLine "     VolumeName: " & HDVolumeName
 objFile.WriteLine "     SerialNumber: " & HDSN
 Objfile.Writeline ""
@@ -259,6 +285,7 @@ objFile.WriteLine "     Commit Limit: " & CommitLimit & " GB"
 objFile.WriteLine "     Committed memory: " & CommittedGB & " GB"
 Objfile.Writeline ""
 objFile.WriteLine "Operating System Info"
+objFile.WriteLine "     Operating System: " & strOS
 objFile.WriteLine "     Boot Device: " & BootDevice
 objFile.WriteLine "     Build Number: " & BuildNumber
 objFile.WriteLine "     Build Type: " & BuildType
@@ -274,6 +301,9 @@ objFile.WriteLine "     Primary: " & Primary
 objFile.WriteLine "     Registered User: " & RegisteredUser
 objFile.WriteLine "     Serial Number: " & SerialNumber
 objFile.WriteLine "     Version: " & Version
+objFile.WriteLine "     Service Pack version (major): " & SPmajor 
+objFile.WriteLine "     Service Pack version (minor): " & SPminor 
+objFile.WriteLine "     Install Date: " & InstallDate 
 Objfile.Writeline ""
 objfile.WriteLine "Firewall Status"
 if (DomainProfStatus <> "0") then
