@@ -1,8 +1,10 @@
 'Initial variable declarations'
 sHostName = "."
 strComputer = "."
+Set objShell = WScript.CreateObject("WScript.Shell")
+strDesktopFolder = objShell.SpecialFolders("Desktop")
 Set objFSO = CreateObject("Scripting.FileSystemObject")
-Set objFile = objFSO.CreateTextFile("results.log", True)
+Set objFile = objFSO.CreateTextFile(strDesktopFolder + "\results.log", True)
 
 msgbox "Scanning Computer..."
 
@@ -10,21 +12,27 @@ msgbox "Obtaining Harddrive statistics..."
 'GET HARD DRIVE SPACE'
 GB = 1024 *1024 * 1024 'Number of bytes in a gigabyte'
 kbGB = 1024 * 1024 ' Number of kilobytes in a GB'
+HDLOGTEXT = ""
 Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
-Set objLogicalDisk = objWMIService.Get("Win32_LogicalDisk.DeviceID='c:'")
-FreeMegaBytes = objLogicalDisk.FreeSpace / GB
-TotalSpace = objLogicalDisk.Size / GB
-FSType = objLogicalDisk.Filesystem
-HDCaption = objLogicalDisk.Caption
-HDDescription = objLogicalDisk.Description
-HDDeviceID = objLogicalDisk.DeviceID
-HDLastError = objLogicalDisk.LastErrorCode
-HDStatus = objLogicalDisk.Status
-HDVolumeDirty = objLogicalDisk.VolumeDirty
-HDVolumeName = objLogicalDisk.VolumeName
-HDSN = objLogicalDisk.VolumeSerialNumber
+Set colItems = objWMIService.ExecQuery("Select * from Win32_LogicalDisk")
 
+For Each objItem in colItems
+HDLOGTEXT = HDLOGTEXT + _
+"     DeviceID: " & objItem.DeviceID & VBnewline & _
+"          File System: " & objItem.Filesystem & VBnewline & _
+"          Total Hard Drive Size: " & Int(objItem.size / GB) & " GB" & VBnewline & _
+"          Free space: " & Int(objItem.FreeSpace / GB) & " GB" & VBnewline & _
+"          Caption: " & objItem.Caption & VBnewline & _
+"          Description: " & objItem.Description & VBnewline & _
+"          Last Error Code: " & objItem.LastErrorCode & VBnewline & _
+"          Current Status: " & objItem.Status & VBnewline 
+If (objItem.VolumeDirty = TRUE) then
+	HDLOGTEXT = HDLOGTEXT + "          Warning! This harddrive needs to be cleaned. You should run disk check." & VBnewline
+end if
+HDLOGTEXT = HDLOGTEXT + "          VolumeName: " & objItem.VolumeName & VBnewline & _
+"          SerialNumber: " & objItem.VolumeSerialNumber & VBnewline & VBNewline
 
+Next
 
 msgbox "Obtaining CPU statistics..."
 'GET CPU USAGE' 
@@ -257,20 +265,7 @@ Set colLoggedEvents = objWMIService.ExecQuery _
 Objfile.Writeline "          SYSTEM STATISTICS"
 Objfile.Writeline ""
 objFile.WriteLine "Hard drive info "
-objFile.WriteLine "     DeviceID: " & HDDeviceID
-objFile.WriteLine "     File System: " & FSType
-objFile.WriteLine "     Total Hard Drive Size: " & Int(TotalSpace) & " GB"
-objFile.WriteLine "     Free space: " & Int(FreeMegabytes) & " GB"
-objFile.WriteLine "     Caption: " & HDCaption
-objFile.WriteLine "     Description: " & HDDescription
-objFile.WriteLine "     Last Error Code: " & HDLastError
-objFile.WriteLine "     Current Status: " & HSStatus
-If (HDVolumeDirty = TRUE) then
-	objFile.WriteLine "     Warning! Your Harddrive needs to be cleaned. You should run disk check."
-end if
-objFile.WriteLine "     VolumeName: " & HDVolumeName
-objFile.WriteLine "     SerialNumber: " & HDSN
-Objfile.Writeline ""
+objFile.WriteLine HDLOGTEXT
 ObjFile.Writeline "CPU Usage Stats:"
 ObjFile.WriteLine "     CPU TOTAL: " & CPUtotal 
 ObjFile.WriteLine "     Average CPU usage: " & CPUAVG & "%"
@@ -279,7 +274,7 @@ objFile.WriteLine "Memory Statistics"
 objFile.Writeline "     Free Physical memory: " & Round(freeMem / kbGB,1) & " GB"
 objFile.Writeline "     Total Physical Memory: " & Round(totalMem / kbGB,1) & " GB"
 objFile.Writeline "     Memory Usage: " & Round((totalMem - freeMem) / totalMem * 100) & "%"
-objFile.Writeline "     Average Memory Usage: " & memAvg
+objFile.Writeline "     Average Memory Usage: " & memAvg & "%"
 objFile.WriteLine "     Availible memory: " & AvailableGB & " GB"
 objFile.WriteLine "     Commit Limit: " & CommitLimit & " GB"
 objFile.WriteLine "     Committed memory: " & CommittedGB & " GB"
