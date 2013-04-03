@@ -344,7 +344,8 @@ Case vbYes
 	End If
 	ranSpybot = true
 Case vbNo
-    sbNo = "You did not run the anti-virus."
+    checkFound = 0
+	sbFound = "You did not run the anti-virus."
 	ranSpybot = false
 End Select
 
@@ -367,7 +368,7 @@ objfile.Writeline CompInfoTableTR2 & "<p class=MsoNormal>" & CompName & "</p> </
 objfile.Writeline "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'><h3>Operating System:</h3> </td>"
 objfile.Writeline " <td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>  <p class=MsoNormal>" & StrOS & "</p>  </td> </tr>"
 objfile.Writeline "<tr>" & CompInfoTable1 &"  <h3>General Status</h3> </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & CompStatus & "</p>  </td>"
-objfile.Writeline CompInfoTable1 &"  <h3>PLACEHOLDER</h3>  </td>" & CompInfoTable2 &"  <p class=MsoNormal>PLACEHOLDER</p>  </td> </tr>"
+objfile.Writeline CompInfoTable1 &"  <h3>Antivirus Alerts</h3>  </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & checkFound & "</p>  </td> </tr>"
 objfile.Writeline" <tr>" & CompInfoTable1 &"  <h3>Scan Begin:</h3>  </td>" &  CompInfoTable2 &"  <p class=MsoNormal>" & StartDate & "</p>  </td>"
 objfile.Writeline  CompInfoTable1 &"  <h3>Report end date</h3>  </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & ReportDate & "</p>  </td> </tr></table>"
 
@@ -413,7 +414,7 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major)
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-
+objfile.Writeline "<h2>Virus Check</h2><p class=MsoNormal>" & sbFound &"</p> <p class=MsoNormal>&nbsp;</p>"
 
 objfile.WriteLine "<h2>Firewall Status</h2>"
 if (DomainProfStatus <> "0") then
