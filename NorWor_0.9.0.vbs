@@ -30,16 +30,18 @@ TableStart = "<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 width
 msgbox "Scanning Computer..."
 
 msgbox "Obtaining Harddrive statistics..."
-'GET HARD DRIVE SPACE'
+'GET HARD DRIVE STATS'
 GB = 1024 *1024 * 1024 'Number of bytes in a gigabyte'
 kbGB = 1024 * 1024 ' Number of kilobytes in a GB'
 HDLOGTEXT = ""
 Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
 Set colItems = objWMIService.ExecQuery("Select * from Win32_LogicalDisk")
 
+DirtyDiskFlag = 0
 For Each objItem in colItems
 If (objItem.VolumeDirty = TRUE) then
 	HDDirty = " Warning! This disk needs to be cleaned. You should run disk check."
+	DirtyDiskFlag = 1
 Else
 	HDDirty = "Disk is clean."
 end if
@@ -269,10 +271,22 @@ end if
 
 'Checks Event log for Unexpected Shutdowns' 'This part is REALLY innefficient and slow if you have a sufficiently large event log'
 msgbox "Checking computer for errors." &VBnewline & "This could take a moment, please be patient."
-Set colLoggedEvents = objWMIService.ExecQuery _
-("Select * from Win32_NTLogEvent Where Logfile = 'System' and " _
+
+	'Checks for ALL unexpected shutdowns (AKA blue screens)'
+Set colLoggedEvents = objWMIService.ExecQuery _ 
+("Select * from Win32_NTLogEvent Where Logfile = 'System' and " _ 
 & "EventCode = '6008'")
-BlueScreens = colLoggedEvents.Count
+TotalBlueScreens = colLoggedEvents.Count
+
+Const CONVERT_TO_LOCAL_TIME = True
+Set dtmStartDate = CreateObject("WbemScripting.SWbemDateTime")
+dtmStartDate.SetVarDate dateadd("m", -1, now)' CONVERT_TO_LOCAL_TIME
+
+	' Checks for unexpected shutdowns in PAST MONTH'
+Set colLoggedEvents = objWMIService.ExecQuery _	
+("Select * from Win32_NTLogEvent Where Logfile = 'System' and " _
+& "EventCode = '6008' and TimeWritten > '" & dtmStartDate & "'")
+RecentBlueScreens = colLoggedEvents.Count
 
 'Spybot
 sbResult = MsgBox ("Do you wish to run an anti-virus check?", _
@@ -371,9 +385,14 @@ if (DomainProfStatus <> "0" AND PrivateProfStatus <> "0" AND PublicProfStatus <>
 	CompStatusDesc = CompStatusDesc & "<br>" & "No Firewall detected!"
 end if
 
-if (BlueScreens >= 1) then
+if (RecentBlueScreens >= 1) then
 	CompStatus = "Problems Found!"
 	CompStatusDesc = CompStatusDesc & "<br>" & "This computer has suffered from unexpected shutdowns in the past."
+end if
+
+if (DirtyDiskFlag = 1) then
+	CompStatus = "Problems Found!"
+	CompStatusDesc = CompStatusDesc & "<br>" & "One of the disks attached to this computer is dirty."
 end if
 
 
@@ -446,7 +465,7 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major)
 objfile.Writeline "   " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-objfile.Writeline "<h2>Virus Check</h2><p class=MsoNormal>" & sbFound &"</p>"
+objfile.Writeline "<h2>Virus Scan Results</h2><p class=MsoNormal>" & sbFound &"</p>"
 
 objfile.WriteLine "<h2>Firewall Status</h2>"
 if (DomainProfStatus <> "0") then
@@ -462,7 +481,7 @@ if (PublicProfStatus = "0" AND DomainProfStatus= "0" AND PrivateProfStatus = "0"
 	objfile.Writeline "<p class=MsoNormal>WARNING! No firewall has been detected!</p>"
 end if
 
-objfile.Writeline "<h2>Unexpected Shutdowns</h2><p class=MsoNormal>" & BlueScreens &"</p> <p class=MsoNormal>&nbsp;</p>"
+objfile.Writeline "<h2>Unexpected Shutdowns</h2><h3>Total:</h3><p class=MsoNormal>" & TotalBlueScreens &"</p><h3>Recent:</h3> <p class=MsoNormal>" & RecentBlueScreens & "</p>"
 
 objfile.Writeline"</div></body></html>"
 
