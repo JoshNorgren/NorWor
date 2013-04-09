@@ -12,15 +12,19 @@ StartTime =  Date & " " & Time
 CompStatus = "OK!"
 
 'HTML bullshit' See comments at very bottom for table template if you want to add new sections to the log file'
-CompInfoTableTR1 = "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt; border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-CompInfoTableTR2 = "<td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-CompInfoTable1 = "<td width=120 valign=top style='width:90pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
-CompInfoTable2 = "<td width=240 valign=top style='width:180pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
+
+TableTR1 = "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt; border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
+TableTR2 = "<td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
+TableFormat1 = "<td width=120 valign=top style='width:90pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
+TableFormat2 = "<td width=240 valign=top style='width:180pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
 TableStart = "<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 width='100%' style='width:100.0%;border-collapse: collapse;border:none'>"
-TableTR1 = "<td width=222 valign=top style='width:166.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-TableTR2 = "<td width=498 valign=top style='width:373.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-TableFormat1 = "<td width=222 valign=top style='width:166.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
-TableFormat2 = "<td width=498 valign=top style='width:373.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
+
+'OLD FORMATTING. IGNORE.'
+'TableTR1 = "<td width=222 valign=top style='width:166.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
+'TableTR2 = "<td width=498 valign=top style='width:373.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
+'TableFormat1 = "<td width=222 valign=top style='width:166.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
+'TableFormat2 = "<td width=498 valign=top style='width:373.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
+
 'END HTML bullshit'
 
 msgbox "Scanning Computer..."
@@ -45,15 +49,16 @@ Else
 	HDLOGTEXT = HDLOGTEXT + _
 	"<h2>" & objitem.Description & " - " & objItem.DeviceID & "</h2>" & _
 	tablestart   & _
-	" <tr> " & TableTR1 & " <h3>File System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & objItem.Filesystem & "</p></td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Int(objItem.size / GB) & " GB</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Int(objItem.FreeSpace / GB) & " GB</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Caption & "</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Last Error Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.LastErrorCode & " </p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Current Status:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Status & " </p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>SerialNumber:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>VolumeName:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & HDDirty & " </p>  </td> </tr>"   & _
+	" <tr> " & TableTR1 & " <h3>File System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & objItem.Filesystem & "</p></td> "   & _
+	"  " & TableTR1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Int(objItem.size / GB) & " GB</p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Int(objItem.FreeSpace / GB) & " GB</p>  </td> "   & _
+	" " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Caption & "</p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Last Error Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.LastErrorCode & " </p>  </td> "   & _
+	"   " & TableFormat1 & "  <h3>Current Status:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Status & " </p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>SerialNumber:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>VolumeName:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & HDDirty & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
 	"</table>"  
 end if
 
@@ -381,67 +386,67 @@ objfile.Writeline"<body lang=EN-US><div class=WordSection1>"
 
 objfile.Writeline"<p class=Companyname>NorWor Computer Diagnostics Tool</p><h1>Computer Status Report</h1><h2>Computer information</h2>"
 objfile.Writeline"<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 summary='Computer information' width='100%' style='width:100.0%;border-collapse: collapse;border:none'>"
-objfile.Writeline"<tr>" & CompInfoTableTR1 & "<h3>Computer Name:</h3> </td>"
-objfile.Writeline CompInfoTableTR2 & "<p class=MsoNormal>" & CompName & "</p> </td>"
+objfile.Writeline"<tr>" & TableTR1 & "<h3>Computer Name:</h3> </td>"
+objfile.Writeline TableTR2 & "<p class=MsoNormal>" & CompName & "</p> </td>"
 objfile.Writeline "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'><h3>Operating System:</h3> </td>"
 objfile.Writeline " <td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>  <p class=MsoNormal>" & StrOS & "</p>  </td> </tr>"
-objfile.Writeline "<tr>" & CompInfoTable1 &"  <h3>General Status</h3> </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & CompStatus & "<br>" & CompStatusDesc & "</p>  </td>"
-objfile.Writeline CompInfoTable1 &"  <h3>Antivirus Alerts</h3>  </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & checkFound & "</p>  </td> </tr>"
-objfile.Writeline" <tr>" & CompInfoTable1 &"  <h3>Scan Begin:</h3>  </td>" &  CompInfoTable2 &"  <p class=MsoNormal>" & StartTime & "</p>  </td>"
-objfile.Writeline  CompInfoTable1 &"  <h3>Report end date</h3>  </td>" & CompInfoTable2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr></table>"
+objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status</h3> </td>" & TableFormat2 &"  <p class=MsoNormal>" & CompStatus & "<br>" & CompStatusDesc & "</p>  </td>"
+objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & checkFound & "</p>  </td> </tr>"
+objfile.Writeline" <tr>" & TableFormat1 &"  <h3>Scan Begin:</h3>  </td>" &  TableFormat2 &"  <p class=MsoNormal>" & StartTime & "</p>  </td>"
+objfile.Writeline  TableFormat1 &"  <h3>Report end date</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr></table>"
 
 
 objFile.WriteLine HDLOGTEXT
 
 objfile.Writeline "<h2>CPU Usage Stats:</h2>"
 objfile.Writeline tablestart
-Objfile.Writeline " <tr> " & TableTR1 & " <h3>Processor Name</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & CpuName & "</p></td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Average CPU usage:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUAVG & "%</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Address width</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CpuAddrWidth & "-Bit</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Description</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUDescription & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUManufacturer & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Processor ID</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Socket Type</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Speed & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
+Objfile.Writeline " <tr> " & TableTR1 & " <h3>Processor Name</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & CpuName & "</p></td> "
+objfile.Writeline " " & TableTR1 & "  <h3>Average CPU usage:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & CPUAVG & "%</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Address width</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CpuAddrWidth & "-Bit</p>  </td> "
+objfile.Writeline " " & TableFormat1 & "  <h3>Description</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUDescription & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUManufacturer & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Processor ID</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Socket Type</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>L2 Cache Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Speed & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline "<h2>Memory Statistics</h2>"
 objfile.Writeline tablestart
-Objfile.Writeline " <tr> " & TableTR1 & " <h3>Total Physical Memory:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(totalMem / kbGB,1) &  "GB</p></td> </tr>"
-objfile.Writeline " <tr> " & TableFormat1 & "  <h3>Free Physical Memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Round(freeMem / kbGB,1) &  "GB</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Round((totalMem - freeMem) / totalMem * 100) & "%</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Availible memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & AvailableGB & " GB</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommitLimit & " GB</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
+Objfile.Writeline " <tr> " & TableTR1 & " <h3>Total Physical Memory:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(totalMem / kbGB,1) &  "GB</p></td> "
+objfile.Writeline " " & TableTR1 & "  <h3>Free Physical Memory:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Round(freeMem / kbGB,1) &  "GB</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Round((totalMem - freeMem) / totalMem * 100) & "%</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Availible memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & AvailableGB & " GB</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommitLimit & " GB</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline "<h2>Operating System Info</h2>"
 objfile.Writeline tablestart
-Objfile.Writeline " <tr> " & TableTR1 & " <h3>Operating System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & strOS & "</p></td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Boot Device:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BootDevice & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Build Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildNumber & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Build Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildType & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Caption & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Code Set:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CodeSet & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Country Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CountryCode & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Encryption Level:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & EncryptionLevel & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Install Date:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & dtmInstallDate & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Licensed Users:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & NumberOfLicensedUsers & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>OS Product Suite:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSProductSuite & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>OS Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSType & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Primary:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Primary & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Registered User:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & RegisteredUser & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Serial Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SerialNumber & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Version:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Version & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPmajor & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
+Objfile.Writeline " <tr> " & TableTR1 & " <h3>Operating System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & strOS & "</p></td> "
+objfile.Writeline "  " & TableTR1 & "  <h3>Boot Device:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & BootDevice & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Build Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildNumber & "</p>  </td> "
+objfile.Writeline " " & TableFormat1 & "  <h3>Build Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildType & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Caption & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Code Set:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CodeSet & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Country Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CountryCode & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Encryption Level:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & EncryptionLevel & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Install Date:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & dtmInstallDate & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Licensed Users:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & NumberOfLicensedUsers & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>OS Product Suite:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSProductSuite & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>OS Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSType & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Primary:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Primary & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Registered User:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & RegisteredUser & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Serial Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SerialNumber & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Version:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Version & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPmajor & "</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-objfile.Writeline "<h2>Virus Check</h2><p class=MsoNormal>" & sbFound &"</p> <p class=MsoNormal>&nbsp;</p>"
+objfile.Writeline "<h2>Virus Check</h2><p class=MsoNormal>" & sbFound &"</p>"
 
 objfile.WriteLine "<h2>Firewall Status</h2>"
 if (DomainProfStatus <> "0") then
