@@ -289,7 +289,7 @@ Set colLoggedEvents = objWMIService.ExecQuery _
 RecentBlueScreens = colLoggedEvents.Count
 
 'Spybot
-sbResult = MsgBox ("Do you wish to run an anti-virus check?", _
+sbResult = MsgBox ("Do you wish to run an anti-virus check? This may take several minutes to a couple hours depending on the size of your hard drives.", _
     vbYesNo, "Anti-Virus")
 
 Select Case sbResult
@@ -307,7 +307,7 @@ Case vbYes
 	q = """" 'Insert quotes
 
 	'Runs Spybot via Command Line
-	strCmd = "cmd.exe /C  C:\" & q & "Program Files (x86)" & q & "\Spybot\SpybotSD.exe /autocheck"
+	strCmd = "cmd.exe /C  C:\" & q & "Program Files (x86)" & q & "\Spybot\SpybotSD.exe /autocheck /autoclose"
 	objShell.Run strCmd, 0, true
 	'sbDoneTime = "Spybot Done at " & Date & " " & Time & nl
 
@@ -317,6 +317,7 @@ Case vbYes
 	For Each aFile In oFolder.Files
 		If fNewest = "" Then
 			Set fNewest = aFile
+			Set fSecond = aFile
 		Else
 			If fNewest.DateCreated < aFile.DateCreated Then
 				Set fSecond = fNewest
