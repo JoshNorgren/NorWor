@@ -11,7 +11,7 @@ CompName = objShell.ExpandEnvironmentStrings( "%COMPUTERNAME%" )
 StartTime =  Date & " " & Time
 CompStatus = "OK!"
 
-'HTML bullshit' See comments at very bottom for table template if you want to add new sections to the log file'
+'HTML formatting nonsense' See comments at very bottom for table template if you want to add new sections to the log file'
 
 TableTR1 = "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt; border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
 TableTR2 = "<td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
@@ -25,7 +25,7 @@ TableStart = "<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 width
 'TableFormat1 = "<td width=222 valign=top style='width:166.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
 'TableFormat2 = "<td width=498 valign=top style='width:373.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
 
-'END HTML bullshit'
+'END HTML formatting nonsense'
 
 msgbox "Scanning Computer..."
 
@@ -37,29 +37,39 @@ HDLOGTEXT = ""
 Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
 Set colItems = objWMIService.ExecQuery("Select * from Win32_LogicalDisk")
 
-DirtyDiskFlag = 0
+
 For Each objItem in colItems
 If (objItem.VolumeDirty = TRUE) then
 	HDDirty = " Warning! This disk needs to be cleaned. You should run disk check."
-	DirtyDiskFlag = 1
+	CompStatus = "Problems Found!"
+	DiskPClass = "<p class=Warning>"
+	CompStatusDesc = CompStatusDesc  & "<a href='#Disks'>One of the disks attached to this computer is dirty.</a>"	
 Else
 	HDDirty = "Disk is clean."
+	DiskPClass = "<p class=MsoNormal>"
 end if
 if (IsNull(objItem.size)) then
 	
 Else
+	if ( (objitem.FreeSpace / objitem.size) < 0.25) then
+		CompStatus = "Problems Found!"
+		DiskPClass2 = "<p class=Warning>"
+		CompStatusDesc = CompStatusDesc  & "<a href='#Disks'>One of the disks attached to this computer is nearing full capacity.</a>"
+	else
+		DiskPClass2 = "<p class=MsoNormal>"
+	end if
 	HDLOGTEXT = HDLOGTEXT + _
 	"<h2>" & objitem.Description & " - " & objItem.DeviceID & "</h2>" & _
 	tablestart   & _
 	" <tr> " & TableTR1 & " <h3>File System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & objItem.Filesystem & "</p></td> "   & _
 	"  " & TableTR1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Int(objItem.size / GB) & " GB</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Int(objItem.FreeSpace / GB) & " GB</p>  </td> "   & _
+	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & DiskPClass2 & Int(objItem.FreeSpace / GB) & " GB</p>  </td> "   & _
 	" " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Caption & "</p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Last Error Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.LastErrorCode & " </p>  </td> "   & _
 	"   " & TableFormat1 & "  <h3>Current Status:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Status & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>SerialNumber:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>VolumeName:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & HDDirty & " </p>  </td> "   & _
+	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & DiskPClass & HDDirty & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
 	"</table>"  
 end if
@@ -239,9 +249,9 @@ CurrentProfiles = fwPolicy2.CurrentProfileTypes
 
 if ( CurrentProfiles AND NET_FW_PROFILE2_DOMAIN ) then
    if fwPolicy2.FirewallEnabled(NET_FW_PROFILE2_DOMAIN) = TRUE then
-      DomainProfStatus = "     Firewall is ON on domain profile."
+      DomainProfStatus = "Firewall is ON on domain profile."
    else
-      DomainProfStatus = "     Firewall is OFF on domain profile."
+      DomainProfStatus = "Firewall is OFF on domain profile."
    end if
 else
     DomainProfStatus = "0"
@@ -249,9 +259,9 @@ end if
 
 if ( CurrentProfiles AND NET_FW_PROFILE2_PRIVATE ) then
    if fwPolicy2.FirewallEnabled(NET_FW_PROFILE2_PRIVATE) = TRUE then
-      PrivateProfStatus = "     Firewall is ON on private profile."
+      PrivateProfStatus = "Firewall is ON on private profile."
    else
-      PrivateProfStatus = "     Firewall is OFF on private profile."
+      PrivateProfStatus = "Firewall is OFF on private profile."
    end if
 else
     PrivateProfStatus = "0"
@@ -259,9 +269,9 @@ end if
 
 if ( CurrentProfiles AND NET_FW_PROFILE2_PUBLIC ) then
    if fwPolicy2.FirewallEnabled(NET_FW_PROFILE2_PUBLIC) = TRUE then
-      PublicProfStatus = "     Firewall is ON on public profile."
+      PublicProfStatus = "Firewall is ON on public profile."
    else
-      PublicProfStatus = "     Firewall is OFF on public profile."
+      PublicProfStatus = "Firewall is OFF on public profile."
    end if
 else
     PublicProfStatus = "0"
@@ -371,57 +381,72 @@ End Select
 'General status checks'
 if (CheckFound >= 1) then
 	CompStatus = "Problems found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "Virus Alerts detected!"
+	CompStatusDesc = CompStatusDesc & "<a href='#VirusInfo'>Virus Alerts detected!</a>" & "<br>"
+	VirusPClass = "<p class=Warning>"
+Else
+	VirusPClass = "<p class=MsoNormal>"
 end if
+
 if ((Round((totalMem - freeMem) / totalMem * 100)) >= 80 ) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "High Memory use detected!"
+	CompStatusDesc = CompStatusDesc & "<a href='#MemInfo'>High Memory use detected!</a>" & "<br>"
+	MemPClass = "<p class=Warning>"
+Else
+	MemPClass = "<p class=MsoNormal>"
 end if
+
 if (CPUAVG >= 75) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "High CPU usage detected!"
+	CompStatusDesc = CompStatusDesc  & "<a href='#CPUInfo'>High CPU usage detected!</a>" & "<br>"
+	CPUPClass = "<p class=Warning>"
+Else
+	CPUPClass = "<p class=MsoNormal>"
 end if
+
 if (DomainProfStatus <> "0" AND PrivateProfStatus <> "0" AND PublicProfStatus <> "0") then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "No Firewall detected!"
+	CompStatusDesc = CompStatusDesc  & "<a href='#FWInfo'>No Firewall detected!</a>" & "<br>"
 end if
 
-if (RecentBlueScreens >= 1) then
+if (TotalBlueScreens >= 1) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "This computer has suffered from unexpected shutdowns in the past."
+	CompStatusDesc = CompStatusDesc  & "<a href='#ShutdownInfo'>This computer has suffered from unexpected shutdowns in the past.</a>" & "<br>"
+	BluePClass = "<p class=Warning>"
+Else
+	BluePClass = "<p class=MsoNormal>"
 end if
 
-if (DirtyDiskFlag = 1) then
-	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<br>" & "One of the disks attached to this computer is dirty."
-end if
+
 
 
 'Writes log file'
 
 ReportTime =  Date & " " & Time
 
-objFile.WriteLine"<html><head><meta http-equiv=Content-Type content='text/html; charset=windows-1252'><meta name=Generator content='Microsoft Word 14 (filtered)'><style><!-- /* Font Definitions */@font-face	{font-family:'Century Gothic';	panose-1:2 11 5 2 2 2 2 2 2 4;} /* Style Definitions */ p.MsoNormal, li.MsoNormal, div.MsoNormal	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:black;}h1	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:12.0pt;	margin-left:0in;	font-size:12.0pt;	font-family:'Century Gothic','sans-serif';	color:#E48312;	text-transform:uppercase;}h2	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	background:#EADBD4;	font-size:11.0pt;	font-family:'Century Gothic','sans-serif';	color:#865640;	font-weight:normal;}h3	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:#BD582C;	font-weight:normal;}p.Companyname, li.Companyname, div.Companyname	{mso-style-name:'Company name';	margin:0in;	margin-bottom:.0001pt;	text-align:center;	font-size:14.0pt;	font-family:'Century Gothic','sans-serif';	color:#49533D;	font-weight:bold;}--></style></head>"
+objFile.WriteLine"<html><head><meta http-equiv=Content-Type content='text/html; charset=windows-1252'><meta name=Generator content='Microsoft Word 14 (filtered)'><style><!-- /* Font Definitions */@font-face	{font-family:'Century Gothic';	panose-1:2 11 5 2 2 2 2 2 2 4;} /* Style Definitions */ p.MsoNormal, li.MsoNormal, div.MsoNormal	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:black;} p.Warning, li.Warning, div.Warning	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:red; font-weight:bold;} h1	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:12.0pt;	margin-left:0in;	font-size:12.0pt;	font-family:'Century Gothic','sans-serif';	color:#E48312;	text-transform:uppercase;}h2	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	background:#EADBD4;	font-size:11.0pt;	font-family:'Century Gothic','sans-serif';	color:#865640;	font-weight:normal;}h3	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:#BD582C;	font-weight:normal;}p.Companyname, li.Companyname, div.Companyname	{mso-style-name:'Company name';	margin:0in;	margin-bottom:.0001pt;	text-align:center;	font-size:14.0pt;	font-family:'Century Gothic','sans-serif';	color:#49533D;	font-weight:bold;}--></style></head>"
 objfile.Writeline"<body lang=EN-US><div class=WordSection1>"
 
-objfile.Writeline"<p class=Companyname>NorWor Computer Diagnostics Tool</p><h1>Computer Status Report</h1><h2>Computer information</h2>"
+objfile.Writeline"<p class=Companyname>NorWor Computer Diagnostics Tool</p><h1>Computer Status Report</h1><a name='CompInfo'><h2>Computer information</h2></a>"
 objfile.Writeline"<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 summary='Computer information' width='100%' style='width:100.0%;border-collapse: collapse;border:none'>"
 objfile.Writeline"<tr>" & TableTR1 & "<h3>Computer Name:</h3> </td>"
 objfile.Writeline TableTR2 & "<p class=MsoNormal>" & CompName & "</p> </td>"
 objfile.Writeline "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'><h3>Operating System:</h3> </td>"
 objfile.Writeline " <td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>  <p class=MsoNormal>" & StrOS & "</p>  </td> </tr>"
-objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status</h3> </td>" & TableFormat2 &"  <p class=MsoNormal>" & CompStatus & "<br>" & CompStatusDesc & "</p>  </td>"
-objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & checkFound & "</p>  </td> </tr>"
 objfile.Writeline" <tr>" & TableFormat1 &"  <h3>Scan Begin:</h3>  </td>" &  TableFormat2 &"  <p class=MsoNormal>" & StartTime & "</p>  </td>"
-objfile.Writeline  TableFormat1 &"  <h3>Report end date</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr></table>"
+objfile.Writeline  TableFormat1 &"  <h3>Report end date</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr>"
+objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status</h3> </td>" & TableFormat2 &"  <p class=MsoNormal>" & CompStatus & "</p>  </td>"
+objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts</h3>  </td>" & TableFormat2 & VirusPClass & checkFound & "</p>  </td> </tr></table>"
 
-
+if (CompStatus = "Problems Found!") then
+	objfile.Writeline "<h2>Problems Found:</h2><p class=MsoNormal>" & CompStatusDesc & "</p>"
+end if
+objfile.Writeline "<a name='Disks'></a>"
 objFile.WriteLine HDLOGTEXT
 
-objfile.Writeline "<h2>CPU Usage Stats:</h2>"
+objfile.Writeline "<a name='CPUInfo'><h2>CPU Usage Stats:</h2></a>"
 objfile.Writeline tablestart
 Objfile.Writeline " <tr> " & TableTR1 & " <h3>Processor Name</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & CpuName & "</p></td> "
-objfile.Writeline " " & TableTR1 & "  <h3>Average CPU usage:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & CPUAVG & "%</p>  </td> </tr>"
+objfile.Writeline " " & TableTR1 & "  <h3>Average CPU usage:</h3>  </td>  " & TableTR2  & CPUPClass & CPUAVG & "%</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Address width</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CpuAddrWidth & "-Bit</p>  </td> "
 objfile.Writeline " " & TableFormat1 & "  <h3>Description</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUDescription & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUManufacturer & "</p>  </td> "
@@ -434,17 +459,17 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </
 objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-objfile.Writeline "<h2>Memory Statistics</h2>"
+objfile.Writeline "<a name='MemInfo'><h2>Memory Statistics</h2></a>"
 objfile.Writeline tablestart
 Objfile.Writeline " <tr> " & TableTR1 & " <h3>Total Physical Memory:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(totalMem / kbGB,1) &  "GB</p></td> "
 objfile.Writeline " " & TableTR1 & "  <h3>Free Physical Memory:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Round(freeMem / kbGB,1) &  "GB</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Round((totalMem - freeMem) / totalMem * 100) & "%</p>  </td> "
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & MemPClass & Round((totalMem - freeMem) / totalMem * 100) & "%</p>  </td> "
 objfile.Writeline "   " & TableFormat1 & "  <h3>Availible memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & AvailableGB & " GB</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommitLimit & " GB</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-objfile.Writeline "<h2>Operating System Info</h2>"
+objfile.Writeline "<a name='OSInfo'><h2>Operating System Info</h2></a>"
 objfile.Writeline tablestart
 Objfile.Writeline " <tr> " & TableTR1 & " <h3>Operating System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & strOS & "</p></td> "
 objfile.Writeline "  " & TableTR1 & "  <h3>Boot Device:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & BootDevice & "</p>  </td> </tr>"
@@ -466,9 +491,9 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major)
 objfile.Writeline "   " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
-objfile.Writeline "<h2>Virus Scan Results</h2><p class=MsoNormal>" & sbFound &"</p>"
+objfile.Writeline "<a name='VirusInfo'><h2>Virus Scan Results</h2></a><p class=MsoNormal>" & sbFound &"</p>"
 
-objfile.WriteLine "<h2>Firewall Status</h2>"
+objfile.WriteLine "<a name='FWInfo'><h2>Firewall Status</h2></a>"
 if (DomainProfStatus <> "0") then
    objfile.WriteLine "<p class=MsoNormal>" & DomainProfStatus & "</p>"
 end if   
@@ -479,10 +504,14 @@ if (PublicProfStatus <> "0") then
    objfile.WriteLine "<p class=MsoNormal>" & PublicProfStatus & "</p>"
 end if 
 if (PublicProfStatus = "0" AND DomainProfStatus= "0" AND PrivateProfStatus = "0") then
-	objfile.Writeline "<p class=MsoNormal>WARNING! No firewall has been detected!</p>"
+	objfile.Writeline "<p class=Warning>WARNING! No firewall has been detected!</p>"
 end if
 
-objfile.Writeline "<h2>Unexpected Shutdowns</h2><h3>Total:</h3><p class=MsoNormal>" & TotalBlueScreens &"</p><h3>Recent:</h3> <p class=MsoNormal>" & RecentBlueScreens & "</p>"
+objfile.Writeline "<a name='ShutdownInfo'><h2>Unexpected Shutdowns</h2></a>"
+objfile.Writeline tablestart
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Total Unexpected Shutdowns (all recorded errors):</h3>  </td>  " & TableFormat2  & BluePClass & TotalBlueScreens &"</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Recent Unexpected Shutdowns (only within last month):</h3>  </td>  " & TableFormat2  & "   <p class=MsoNormal>" & RecentBlueScreens & "</p>  </td> </tr>"
+objfile.writeline "</table>"
 
 objfile.Writeline"</div></body></html>"
 
