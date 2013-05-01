@@ -305,21 +305,14 @@ sbResult = MsgBox ("Do you wish to run an anti-virus check? This may take severa
 Select Case sbResult
 Case vbYes
     
-	'Setting output file location
-	'outFile="spybot_output.txt"
 	nl = vbNewline
-	'Set objFSO=CreateObject("Scripting.FileSystemObject")
-	'Set objFile = objFSO.CreateTextFile(outFile,True)	
-
-	'sbStartTime = "Running Spybot at" &  Date & " " & Time & nl
-
-	'Set objShell = CreateObject("WScript.Shell")
 	q = """" 'Insert quotes
 
 	'Runs Spybot via Command Line
-	strCmd = "cmd.exe /C  C:\" & q & "Program Files (x86)" & q & "\Spybot\SpybotSD.exe /autocheck /autoclose"
+
+	strCmd = "cmd.exe /C  \Scripts\Spybot\SpybotSD.exe /autocheck /autoclose"
 	objShell.Run strCmd, 0, true
-	'sbDoneTime = "Spybot Done at " & Date & " " & Time & nl
+
 
 	'Get the spybot log file and find the newest file by comparison. Also saving the second newest file.
 	Dim fNewest, fSecond
@@ -336,17 +329,11 @@ Case vbYes
 		End If
 	Next
 
-	'objFile.Write(fNewest.Name) & nl 'Debug output
-	'objFile.Write(fSecond.Name) & nl 'Debug output
-
 	'Reading the log file and finding threats found
 	Const forReading = 1
 
 	Set objRegEx = CreateObject("VBScript.RegExp")
 	objRegEx.Pattern = "found:" 'Search string
-
-	'CStr(fSecond.Name) takes the name of the second newest log file, (.log instead of .txt) and searches for search string within.
-	'objFile.Write("C:\ProgramData\Spybot - Search & Destroy\Logs\" & CStr(fSecond.Name) & nl)
 
 	Set WshShell = CreateObject ("Wscript.Shell")
 	Set logFSO = CreateObject("Scripting.FileSystemObject")
@@ -360,7 +347,7 @@ Case vbYes
 		Set colMatches = objRegEx.Execute(strSearchString)
 		If colMatches.Count > 0 Then
 			For Each strMatch in colMatches
-				sbFound = sbFound + (strSearchString & nl)
+				sbFound = sbFound + strSearchString + nl
 				checkFound = checkFound + 1
 			Next
 		End If
