@@ -31,25 +31,27 @@ kbGB = 1024 * 1024 ' Number of kilobytes in a GB'
 HDLOGTEXT = ""
 Set objWMIService = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" & strComputer & "\root\cimv2")
 Set colItems = objWMIService.ExecQuery("Select * from Win32_LogicalDisk")
-
+DirtyDiskCount = 0
+FullDiskCount = 0
 
 For Each objItem in colItems
-If (objItem.VolumeDirty = TRUE) then
-	HDDirty = " Warning! This disk needs to be cleaned. You should run disk check."
-	CompStatus = "Problems Found!"
-	DiskPClass = "<p class=Warning>"
-	CompStatusDesc = CompStatusDesc  & "<a href='#Disks'>One of the disks attached to this computer is dirty.</a>"	
-Else
-	HDDirty = "Disk is clean."
-	DiskPClass = "<p class=MsoNormal>"
-end if
+
 if (IsNull(objItem.size)) then
 	
 Else
+	If (objItem.VolumeDirty = TRUE) then
+		HDDirty = " Warning! This disk needs to be cleaned. You should run disk check."
+		CompStatus = "Problems Found!"
+		DiskPClass = "<p class=Warning>"
+		DirtyDiskCount = DirtyDiskCount + 1
+	Else
+		HDDirty = "Disk is clean."
+		DiskPClass = "<p class=MsoNormal>"
+	end if
 	if ( (objitem.FreeSpace / objitem.size) < 0.25) then
 		CompStatus = "Problems Found!"
 		DiskPClass2 = "<p class=Warning>"
-		CompStatusDesc = CompStatusDesc  & "<a href='#Disks'>One of the disks attached to this computer is nearing full capacity.</a>"
+		FullDiskCount = FullDiskCount + 1
 	else
 		DiskPClass2 = "<p class=MsoNormal>"
 	end if
@@ -68,7 +70,12 @@ Else
 end if
 
 Next
-
+if (DirtyDiskCount > 0) then
+	CompStatusDesc = CompStatusDesc  & "<p class=MsoNormal><a href='#Disks'>One of the disks attached to this computer is dirty.</a></p>"
+end if	
+if (FullDiskCount > 0) then
+	CompStatusDesc = CompStatusDesc  & "<p class=MsoNormal><a href='#Disks'>One of the disks attached to this computer is nearing full capacity.</a></p>"
+end if
 
 'GET CPU USAGE' 
 Samples = 5
@@ -155,13 +162,41 @@ Next
 Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
 Set colItems = objWMIService.ExecQuery("Select * from Win32_PhysicalMemory",,48)
 For Each objItem in colItems
+	select case objitem.MemoryType
+	Case 0
+		MemType = "Unknown"
+	Case 20 
+		MemType = "DDR"
+	Case 21
+		Memtype = "DDR-2"
+	Case Else
+		Memtype = "Other"
+	End select
+	
+	select case objitem.FormFactor
+	Case 0
+		MemForm = "Unknown"
+	Case 7
+		MemForm = "SIMM"
+	Case 8
+		MemForm = "DIMM"
+	Case 11
+		MemForm = "RIMM"
+	Case 12
+		MemForm = "SODIMM"
+	Case 13 
+		MemForm = "SRIMM"
+	Case else
+		MemForm = "Other"
+	End select
+	
 	MEMLOGTEXT = MEMLOGTEXT + _
 	" <tr>  " & TableFormat1 & " <b><h4>" & objItem.Description  & " - " & objItem.BankLabel & "</h4></b> </td>  " & TableFormat2  & "  <p class=MsoNormal> &nbsp; </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
 	" <tr> " & TableFormat1 & " <h3>Capacity: </h3></td>" & TableFormat2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,1) & "GB" & "</p></td> "   & _
 	"  " & TableFormat1 & "  <h3>Speed: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Speed & "</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Form Factor: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.FormFactor & " </p>  </td> "   & _
-	"  " & TableFormat1 & "  <h3>Memory Type: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.MemoryType & " </p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Form Factor: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & MemForm & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>Memory Type: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & MemType & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Device Locator:  </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.DeviceLocator & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"  
 Next
@@ -176,21 +211,16 @@ For Each os in oss 											'Most of these are unnecessary but I'm leaving the
     BuildNumber = os.BuildNumber
     BuildType = os.BuildType
     Caption = os.Caption
-    CodeSet = os.CodeSet
-    CountryCode = os.CountryCode
-   
+    
     EncryptionLevel = os.EncryptionLevel
     dtmConvertedDate.Value = os.InstallDate
     dtmInstallDate = dtmConvertedDate.GetVarDate
    
-    OSProductSuite = os.OSProductSuite
-    OSType = os.OSType
+
     Primary = os.Primary
     RegisteredUser = os.RegisteredUser
     SerialNumber = os.SerialNumber
     Version = os.Version
-	SPmajor = os.ServicePackMajorVersion
-	SPminor = os.ServicePackMinorVersion
 	InstallDate = os.InstallDate
 Next
 
@@ -314,7 +344,7 @@ Case vbYes
 
 	'Runs Spybot via Command Line
 
-	strCmd = "cmd.exe /C  \Scripts\Spybot\SpybotSD.exe /autocheck /autoclose"
+	strCmd = "cmd.exe /C  \Scripts\Spybot\SpybotSD.exe /autoupdate /autocheck /autoclose"
 	objShell.Run strCmd, 0, true
 
 
@@ -378,7 +408,7 @@ Else
 	VirusPClass = "<p class=MsoNormal>"
 end if
 
-if ((Round((totalMem - freeMem) / totalMem * 100)) >= 80 ) then
+if ((Round((totalMem - freeMem) / totalMem * 100)) >= 90 ) then
 	CompStatus = "Problems Found!"
 	CompStatusDesc = CompStatusDesc & "<p class=MsoNormal><a href='#MemInfo'>High Memory use detected!</a></p>" 
 	MemPClass = "<p class=Warning>"
@@ -444,8 +474,8 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " 
 objfile.Writeline "  " & TableFormat1 & "  <h3>Processor ID</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Socket Type</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"
 objfile.writeline "</table>"
@@ -467,20 +497,12 @@ Objfile.Writeline " <tr> " & TableTR1 & " <h3>Operating System:</h3></td>" & Tab
 objfile.Writeline "  " & TableTR1 & "  <h3>Boot Device:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & BootDevice & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Build Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildNumber & "</p>  </td> "
 objfile.Writeline " " & TableFormat1 & "  <h3>Build Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & BuildType & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Caption & "</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>Code Set:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CodeSet & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Country Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CountryCode & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>Encryption Level:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & EncryptionLevel & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Install Date:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & dtmInstallDate & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>OS Product Suite:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSProductSuite & "</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>OS Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSType & "</p>  </td> </tr>"
+objfile.Writeline "  " & TableFormat1 & "  <h3>Encryption Level:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & EncryptionLevel & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Primary:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Primary & "</p>  </td> "
 objfile.Writeline "   " & TableFormat1 & "  <h3>Registered User:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & RegisteredUser & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Serial Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SerialNumber & "</p>  </td> "
 objfile.Writeline "   " & TableFormat1 & "  <h3>Version:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Version & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Service Pack version (major):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPmajor & "</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>Service Pack version (minor):</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & SPminor & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline "<a name='VirusInfo'><h2>Virus Scan Results</h2></a><p class=MsoNormal>" & sbFound &"</p>"
@@ -501,8 +523,8 @@ end if
 
 objfile.Writeline "<a name='ShutdownInfo'><h2>Unexpected Shutdowns</h2></a>"
 objfile.Writeline tablestart
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Total Unexpected Shutdowns (all recorded errors):</h3>  </td>  " & TableFormat2  & "   <p class=MsoNormal>"  & TotalBlueScreens &"</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>Recent Unexpected Shutdowns (only within last month):</h3>  </td>  " & TableFormat2  & BluePClass & RecentBlueScreens & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableTR1 & "  <h3>Total (lifetime of computer): </h3>  </td>  " & TableTR2  & "   <p class=MsoNormal>"  & TotalBlueScreens &"</p>  </td> "
+objfile.Writeline "   " & TableTR1 & "  <h3>Recent (only within last month):</h3>  </td>  " & TableTR2  & BluePClass & RecentBlueScreens & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline"</div></body></html>"
