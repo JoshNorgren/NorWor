@@ -156,15 +156,14 @@ Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
 Set colItems = objWMIService.ExecQuery("Select * from Win32_PhysicalMemory",,48)
 For Each objItem in colItems
 	MEMLOGTEXT = MEMLOGTEXT + _
-	"<h2>" & objItem.Description  & " - " & objItem.BankLabel & "</h2>" & _
-	tablestart   & _
-	" <tr> " & TableTR1 & " <h3>Capacity: </h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,1) & "GB" & "</p></td> "   & _
-	"  " & TableTR1 & "  <h3>Speed: </h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & objItem.Speed & "</p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & " <b><h4>" & objItem.Description  & " - " & objItem.BankLabel & "</h4></b> </td>  " & TableFormat2  & "  <p class=MsoNormal> &nbsp; </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
+	" <tr> " & TableFormat1 & " <h3>Capacity: </h3></td>" & TableFormat2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,1) & "GB" & "</p></td> "   & _
+	"  " & TableFormat1 & "  <h3>Speed: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Speed & "</p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Form Factor: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.FormFactor & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>Memory Type: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.MemoryType & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Device Locator:  </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.DeviceLocator & " </p>  </td> "   & _
-	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
-	"</table>"  
+	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"  
 Next
 
 'Get OS info'
@@ -415,7 +414,7 @@ end if
 
 ReportTime =  Date & " " & Time
 
-objFile.WriteLine"<html><head><meta http-equiv=Content-Type content='text/html; charset=windows-1252'><meta name=Generator content='Microsoft Word 14 (filtered)'><style><!-- /* Font Definitions */@font-face	{font-family:'Century Gothic';	panose-1:2 11 5 2 2 2 2 2 2 4;} /* Style Definitions */ p.MsoNormal, li.MsoNormal, div.MsoNormal	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:black;} p.Warning, li.Warning, div.Warning	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:red; font-weight:bold;} h1	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:12.0pt;	margin-left:0in;	font-size:12.0pt;	font-family:'Century Gothic','sans-serif';	color:#E48312;	text-transform:uppercase;}h2	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	background:#EADBD4;	font-size:11.0pt;	font-family:'Century Gothic','sans-serif';	color:#865640;	font-weight:normal;}h3	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:#BD582C;	font-weight:normal;}p.Companyname, li.Companyname, div.Companyname	{mso-style-name:'Company name';	margin:0in;	margin-bottom:.0001pt;	text-align:center;	font-size:14.0pt;	font-family:'Century Gothic','sans-serif';	color:#49533D;	font-weight:bold;}--></style></head>"
+objFile.WriteLine"<html><head><meta http-equiv=Content-Type content='text/html; charset=windows-1252'><meta name=Generator content='Microsoft Word 14 (filtered)'><style><!-- /* Font Definitions */@font-face	{font-family:'Century Gothic';	panose-1:2 11 5 2 2 2 2 2 2 4;} /* Style Definitions */ p.MsoNormal, li.MsoNormal, div.MsoNormal	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:black;} p.Warning, li.Warning, div.Warning	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:red; font-weight:bold;} h1	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:12.0pt;	margin-left:0in;	font-size:12.0pt;	font-family:'Century Gothic','sans-serif';	color:#E48312;	text-transform:uppercase;}h2	{margin-top:12.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	background:#EADBD4;	font-size:11.0pt;	font-family:'Century Gothic','sans-serif';	color:#865640;	font-weight:normal;}h3	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:9.0pt;	font-family:'Century Gothic','sans-serif';	color:#BD582C;	font-weight:normal;} h4	{margin-top:5.0pt;	margin-right:0in;	margin-bottom:5.0pt;	margin-left:0in;	font-size:10.0pt;	font-family:'Century Gothic','sans-serif';	color:#865640;	font-weight:bold;}p.Companyname, li.Companyname, div.Companyname	{mso-style-name:'Company name';	margin:0in;	margin-bottom:.0001pt;	text-align:center;	font-size:14.0pt;	font-family:'Century Gothic','sans-serif';	color:#49533D;	font-weight:bold;}--></style></head>"
 objfile.Writeline"<body lang=EN-US><div class=WordSection1>"
 
 objfile.Writeline"<p class=Companyname>NorWor Computer Diagnostics Tool</p><h1>Computer Status Report</h1><a name='CompInfo'><h2>Computer information</h2></a>"
@@ -459,9 +458,8 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  
 objfile.Writeline "   " & TableFormat1 & "  <h3>Availible memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & AvailableGB & " GB</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommitLimit & " GB</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
-objfile.writeline "</table>"
-
 objfile.writeline MEMLOGTEXT
+objfile.writeline "</table>"
 
 objfile.Writeline "<a name='OSInfo'><h2>Operating System Info</h2></a>"
 objfile.Writeline tablestart
