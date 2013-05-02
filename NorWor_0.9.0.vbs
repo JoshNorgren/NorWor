@@ -19,17 +19,12 @@ TableFormat1 = "<td width=120 valign=top style='width:90pt;border:none;border-bo
 TableFormat2 = "<td width=240 valign=top style='width:180pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
 TableStart = "<table class=ListTable2 border=1 cellspacing=0 cellpadding=0 width='100%' style='width:100.0%;border-collapse: collapse;border:none'>"
 
-'OLD FORMATTING. IGNORE.'
-'TableTR1 = "<td width=222 valign=top style='width:166.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-'TableTR2 = "<td width=498 valign=top style='width:373.5pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>"
-'TableFormat1 = "<td width=222 valign=top style='width:166.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
-'TableFormat2 = "<td width=498 valign=top style='width:373.5pt;border:none;border-bottom:solid #666666 1.0pt;  padding:0in 0in 0in 0in'>"
 
 'END HTML formatting nonsense'
 
-msgbox "Scanning Computer..."
+msgbox "Scanning Computer..." & vbNewline & "This may take a few minutes."
 
-msgbox "Obtaining Harddrive statistics..."
+
 'GET HARD DRIVE STATS'
 GB = 1024 *1024 * 1024 'Number of bytes in a gigabyte'
 kbGB = 1024 * 1024 ' Number of kilobytes in a GB'
@@ -65,8 +60,6 @@ Else
 	"  " & TableTR1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Int(objItem.size / GB) & " GB</p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & DiskPClass2 & Int(objItem.FreeSpace / GB) & " GB</p>  </td> "   & _
 	" " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Caption & "</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Last Error Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.LastErrorCode & " </p>  </td> "   & _
-	"   " & TableFormat1 & "  <h3>Current Status:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Status & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>SerialNumber:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>VolumeName:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & DiskPClass & HDDirty & " </p>  </td> "   & _
@@ -76,7 +69,7 @@ end if
 
 Next
 
-msgbox "Obtaining CPU statistics..."
+
 'GET CPU USAGE' 
 Samples = 5
 CPUtotal = 0
@@ -117,7 +110,7 @@ For Each objItem in colItems
 	 CPUMaxClock= objItem.MaxClockSpeed
 Next
 
-msgbox "Obtaining Memory statistics..."
+
 
 
 
@@ -159,8 +152,20 @@ For Each objItem in colItems
 
 Next
 
-msgbox "Obtaining Operating System statistics..."
-
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\cimv2")
+Set colItems = objWMIService.ExecQuery("Select * from Win32_PhysicalMemory",,48)
+For Each objItem in colItems
+	MEMLOGTEXT = MEMLOGTEXT + _
+	"<h2>" & objItem.Description  & " - " & objItem.BankLabel & "</h2>" & _
+	tablestart   & _
+	" <tr> " & TableTR1 & " <h3>Capacity: </h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,1) & "GB" & "</p></td> "   & _
+	"  " & TableTR1 & "  <h3>Speed: </h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & objItem.Speed & "</p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Form Factor: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.FormFactor & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>Memory Type: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.MemoryType & " </p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Device Locator:  </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.DeviceLocator & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
+	"</table>"  
+Next
 
 'Get OS info'
 Set dtmConvertedDate = CreateObject("WbemScripting.SWbemDateTime")
@@ -215,7 +220,7 @@ strOS= strOS & " 32 bit"
 END IF
 
 
-msgbox "Testing for firewall..."
+
 
 
 'Firewall test'
@@ -280,7 +285,7 @@ end if
 
 
 'Checks Event log for Unexpected Shutdowns' 'This part is REALLY innefficient and slow if you have a sufficiently large event log'
-msgbox "Checking computer for errors." &VBnewline & "This could take a moment, please be patient."
+
 
 	'Checks for ALL unexpected shutdowns (AKA blue screens)'
 Set colLoggedEvents = objWMIService.ExecQuery _ 
@@ -368,7 +373,7 @@ End Select
 'General status checks'
 if (CheckFound >= 1) then
 	CompStatus = "Problems found!"
-	CompStatusDesc = CompStatusDesc & "<a href='#VirusInfo'>Virus Alerts detected!</a>" & "<br>"
+	CompStatusDesc = CompStatusDesc & "<p class=MsoNormal><a href='#VirusInfo'>Virus Alerts detected!</a></p> " 
 	VirusPClass = "<p class=Warning>"
 Else
 	VirusPClass = "<p class=MsoNormal>"
@@ -376,7 +381,7 @@ end if
 
 if ((Round((totalMem - freeMem) / totalMem * 100)) >= 80 ) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc & "<a href='#MemInfo'>High Memory use detected!</a>" & "<br>"
+	CompStatusDesc = CompStatusDesc & "<p class=MsoNormal><a href='#MemInfo'>High Memory use detected!</a></p>" 
 	MemPClass = "<p class=Warning>"
 Else
 	MemPClass = "<p class=MsoNormal>"
@@ -384,7 +389,7 @@ end if
 
 if (CPUAVG >= 75) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc  & "<a href='#CPUInfo'>High CPU usage detected!</a>" & "<br>"
+	CompStatusDesc = CompStatusDesc  & "<p class=MsoNormal><a href='#CPUInfo'>High CPU usage detected!</a></p>" 
 	CPUPClass = "<p class=Warning>"
 Else
 	CPUPClass = "<p class=MsoNormal>"
@@ -392,12 +397,12 @@ end if
 
 if (DomainProfStatus <> "0" AND PrivateProfStatus <> "0" AND PublicProfStatus <> "0") then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc  & "<a href='#FWInfo'>No Firewall detected!</a>" & "<br>"
+	CompStatusDesc = CompStatusDesc  & "<p class=MsoNormal><a href='#FWInfo'>No Firewall detected!</a></p>"
 end if
 
-if (TotalBlueScreens >= 1) then
+if (RecentBlueScreens >= 1) then
 	CompStatus = "Problems Found!"
-	CompStatusDesc = CompStatusDesc  & "<a href='#ShutdownInfo'>This computer has suffered from unexpected shutdowns in the past.</a>" & "<br>"
+	CompStatusDesc = CompStatusDesc  & "<p class=MsoNormal><a href='#ShutdownInfo'>This computer has suffered from unexpected shutdowns in the past.</a></p>" 
 	BluePClass = "<p class=Warning>"
 Else
 	BluePClass = "<p class=MsoNormal>"
@@ -425,7 +430,7 @@ objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status</h3> </td>" & Tab
 objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts</h3>  </td>" & TableFormat2 & VirusPClass & checkFound & "</p>  </td> </tr></table>"
 
 if (CompStatus = "Problems Found!") then
-	objfile.Writeline "<h2>Problems Found:</h2><p class=MsoNormal>" & CompStatusDesc & "</p>"
+	objfile.Writeline "<h2>Problems Found:</h2>" & CompStatusDesc 
 end if
 objfile.Writeline "<a name='Disks'></a>"
 objFile.WriteLine HDLOGTEXT
@@ -440,10 +445,10 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " 
 objfile.Writeline "  " & TableFormat1 & "  <h3>Processor ID</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Socket Type</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>L2 Cache Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Speed & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline "<a name='MemInfo'><h2>Memory Statistics</h2></a>"
@@ -456,6 +461,8 @@ objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
 objfile.writeline "</table>"
 
+objfile.writeline MEMLOGTEXT
+
 objfile.Writeline "<a name='OSInfo'><h2>Operating System Info</h2></a>"
 objfile.Writeline tablestart
 Objfile.Writeline " <tr> " & TableTR1 & " <h3>Operating System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & strOS & "</p></td> "
@@ -467,7 +474,7 @@ objfile.Writeline "   " & TableFormat1 & "  <h3>Code Set:</h3>  </td>  " & Table
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Country Code:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CountryCode & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Encryption Level:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & EncryptionLevel & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Install Date:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & dtmInstallDate & "</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>Licensed Users:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & NumberOfLicensedUsers & "</p>  </td> </tr>"
+objfile.Writeline "  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>OS Product Suite:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSProductSuite & "</p>  </td> "
 objfile.Writeline "   " & TableFormat1 & "  <h3>OS Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & OSType & "</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Primary:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & Primary & "</p>  </td> "
@@ -496,17 +503,11 @@ end if
 
 objfile.Writeline "<a name='ShutdownInfo'><h2>Unexpected Shutdowns</h2></a>"
 objfile.Writeline tablestart
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Total Unexpected Shutdowns (all recorded errors):</h3>  </td>  " & TableFormat2  & BluePClass & TotalBlueScreens &"</p>  </td> "
-objfile.Writeline "   " & TableFormat1 & "  <h3>Recent Unexpected Shutdowns (only within last month):</h3>  </td>  " & TableFormat2  & "   <p class=MsoNormal>" & RecentBlueScreens & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Total Unexpected Shutdowns (all recorded errors):</h3>  </td>  " & TableFormat2  & "   <p class=MsoNormal>"  & TotalBlueScreens &"</p>  </td> "
+objfile.Writeline "   " & TableFormat1 & "  <h3>Recent Unexpected Shutdowns (only within last month):</h3>  </td>  " & TableFormat2  & BluePClass & RecentBlueScreens & "</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline"</div></body></html>"
 
-''Table Template 'Replace all &nbsp; with desired text or variables'
-''objfile.Writeline "<h2>&nbsp;</h2>"
-''objfile.Writeline tablestart
-''Objfile.Writeline " <tr> " & TableTR1 & " <h3>&nbsp;</h3></td>" & TableTR2 & "  <p class=MsoNormal>&nbsp;</p></td> </tr>"
-''objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>
-''objfile.writeline "</table>"
 
 msgbox "Scan Complete! Results saved to your desktop as 'NorWor.html'" 
