@@ -338,6 +338,10 @@ sbResult = MsgBox ("Do you wish to run an anti-virus check? This may take severa
 
 Select Case sbResult
 Case vbYes
+
+	
+	updateCmd = "cmd.exe /C  \Scripts\Spybot\SDUpdate.exe /search /autoclose"
+	objShell.Run updateCmd, 0, true
     
 	nl = vbNewline
 	q = """" 'Insert quotes
