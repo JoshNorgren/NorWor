@@ -59,11 +59,11 @@ Else
 	"<h2>" & objitem.Description & " - " & objItem.DeviceID & "</h2>" & _
 	tablestart   & _
 	" <tr> " & TableTR1 & " <h3>File System:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & objItem.Filesystem & "</p></td> "   & _
-	"  " & TableTR1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Int(objItem.size / GB) & " GB</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & DiskPClass2 & Int(objItem.FreeSpace / GB) & " GB</p>  </td> "   & _
+	"  " & TableTR1 & "  <h3>Total Hard Drive Size:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Round(objItem.size / GB,2) & " GB</p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Free space:</h3>  </td>  " & TableFormat2  & DiskPClass2 & Round(objItem.FreeSpace / GB,2) & " GB</p>  </td> "   & _
 	" " & TableFormat1 & "  <h3>Caption:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Caption & "</p>  </td> </tr>"   & _
-	" <tr>  " & TableFormat1 & "  <h3>SerialNumber:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> "   & _
-	"  " & TableFormat1 & "  <h3>VolumeName:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
+	" <tr>  " & TableFormat1 & "  <h3>Serial Number:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeSerialNumber & " </p>  </td> "   & _
+	"  " & TableFormat1 & "  <h3>Volume Name:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.VolumeName & " </p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Disk Clean?</h3>  </td>  " & TableFormat2  & DiskPClass & HDDirty & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
 	"</table>"  
@@ -153,9 +153,9 @@ Set Memory = GetObject("winmgmts:{impersonationLevel=impersonate}!//" _
 Set colItems = objWMIService.ExecQuery("Select * from Win32_PerfFormattedData_PerfOS_Memory",,48)
 
 For Each objItem in colItems
-    AvailableGB = Round(objItem.AvailableBytes / GB,3)
-    CommitLimit = Round(objItem.CommitLimit / GB,3)
-    CommittedGB = Round(objItem.CommittedBytes / GB,3)
+    AvailableGB = Round(objItem.AvailableBytes / GB,2)
+    CommitLimit = Round(objItem.CommitLimit / GB,2)
+    CommittedGB = Round(objItem.CommittedBytes / GB,2)
 
 Next
 
@@ -193,7 +193,7 @@ For Each objItem in colItems
 	MEMLOGTEXT = MEMLOGTEXT + _
 	" <tr>  " & TableFormat1 & " <b><h4>" & objItem.Description  & " - " & objItem.BankLabel & "</h4></b> </td>  " & TableFormat2  & "  <p class=MsoNormal> &nbsp; </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"   & _
-	" <tr> " & TableFormat1 & " <h3>Capacity: </h3></td>" & TableFormat2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,1) & "GB" & "</p></td> "   & _
+	" <tr> " & TableFormat1 & " <h3>Capacity: </h3></td>" & TableFormat2 & "  <p class=MsoNormal>" & Round(objItem.Capacity/ GB,2) & "GB" & "</p></td> "   & _
 	"  " & TableFormat1 & "  <h3>Speed: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & objItem.Speed & "</p>  </td> </tr>"   & _
 	" <tr>  " & TableFormat1 & "  <h3>Form Factor: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & MemForm & " </p>  </td> "   & _
 	"  " & TableFormat1 & "  <h3>Memory Type: </h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & MemType & " </p>  </td> </tr>"   & _
@@ -412,7 +412,7 @@ Else
 	VirusPClass = "<p class=MsoNormal>"
 end if
 
-if ((Round((totalMem - freeMem) / totalMem * 100)) >= 90 ) then
+if ((Round((totalMem - freeMem) / totalMem * 100)) >= 90) then
 	CompStatus = "Problems Found!"
 	CompStatusDesc = CompStatusDesc & "<p class=MsoNormal><a href='#MemInfo'>High Memory use detected!</a></p>" 
 	MemPClass = "<p class=Warning>"
@@ -458,9 +458,9 @@ objfile.Writeline TableTR2 & "<p class=MsoNormal>" & CompName & "</p> </td>"
 objfile.Writeline "<td width=120 valign=top style='width:90pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'><h3>Operating System:</h3> </td>"
 objfile.Writeline " <td width=240 valign=top style='width:180pt;border-top:solid #666666 1.0pt;  border-left:none;border-bottom:solid #666666 1.0pt;border-right:none;  padding:0in 0in 0in 0in'>  <p class=MsoNormal>" & StrOS & "</p>  </td> </tr>"
 objfile.Writeline" <tr>" & TableFormat1 &"  <h3>Scan Begin:</h3>  </td>" &  TableFormat2 &"  <p class=MsoNormal>" & StartTime & "</p>  </td>"
-objfile.Writeline  TableFormat1 &"  <h3>Report end date</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr>"
-objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status</h3> </td>" & TableFormat2 &"  <p class=MsoNormal>" & CompStatus & "</p>  </td>"
-objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts</h3>  </td>" & TableFormat2 & VirusPClass & checkFound & "</p>  </td> </tr></table>"
+objfile.Writeline  TableFormat1 &"  <h3>Scan End:</h3>  </td>" & TableFormat2 &"  <p class=MsoNormal>" & ReportTime & "</p>  </td> </tr>"
+objfile.Writeline "<tr>" & TableFormat1 &"  <h3>General Status:</h3> </td>" & TableFormat2 &"  <p class=MsoNormal>" & CompStatus & "</p>  </td>"
+objfile.Writeline TableFormat1 &"  <h3>Antivirus Alerts:</h3>  </td>" & TableFormat2 & VirusPClass & checkFound & "</p>  </td> </tr></table>"
 
 if (CompStatus = "Problems Found!") then
 	objfile.Writeline "<h2>Problems Found:</h2>" & CompStatusDesc 
@@ -470,25 +470,25 @@ objFile.WriteLine HDLOGTEXT
 
 objfile.Writeline "<a name='CPUInfo'><h2>CPU Usage Stats:</h2></a>"
 objfile.Writeline tablestart
-Objfile.Writeline " <tr> " & TableTR1 & " <h3>Processor Name</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & CpuName & "</p></td> "
+Objfile.Writeline " <tr> " & TableTR1 & " <h3>Processor Name:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & CpuName & "</p></td> "
 objfile.Writeline " " & TableTR1 & "  <h3>Average CPU usage:</h3>  </td>  " & TableTR2  & CPUPClass & CPUAVG & "%</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Address width</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CpuAddrWidth & "-Bit</p>  </td> "
-objfile.Writeline " " & TableFormat1 & "  <h3>Description</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUDescription & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUManufacturer & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>Processor ID</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>Socket Type</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> "
-objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock SPeed</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Address width:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CpuAddrWidth & "-Bit</p>  </td> "
+objfile.Writeline " " & TableFormat1 & "  <h3>Description:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUDescription & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Manufacturer:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUManufacturer & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Processor ID:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUProcessorId & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Revision:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPURevision & "</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Socket Type:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUSocket & "</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Current Clock Speed:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> "
+objfile.Writeline "  " & TableFormat1 & "  <h3>Maximum Clock Speed:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUCurrentClock & " MHz</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>L2 Cache Size:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CPUL2Size & "</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>&nbsp;</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>&nbsp;</p>  </td> </tr>"
 objfile.writeline "</table>"
 
 objfile.Writeline "<a name='MemInfo'><h2>Memory Statistics</h2></a>"
 objfile.Writeline tablestart
-Objfile.Writeline " <tr> " & TableTR1 & " <h3>Total Physical Memory:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(totalMem / kbGB,1) &  "GB</p></td> "
-objfile.Writeline " " & TableTR1 & "  <h3>Free Physical Memory:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Round(freeMem / kbGB,1) &  "GB</p>  </td> </tr>"
-objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & MemPClass & Round((totalMem - freeMem) / totalMem * 100) & "%</p>  </td> "
+Objfile.Writeline " <tr> " & TableTR1 & " <h3>Total Physical Memory:</h3></td>" & TableTR2 & "  <p class=MsoNormal>" & Round(totalMem / kbGB,2) &  "GB</p></td> "
+objfile.Writeline " " & TableTR1 & "  <h3>Free Physical Memory:</h3>  </td>  " & TableTR2  & "  <p class=MsoNormal>" & Round(freeMem / kbGB,2) &  "GB</p>  </td> </tr>"
+objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Memory Usage: </h3>  </td>  " & TableFormat2  & MemPClass & Round((totalMem - freeMem) / totalMem * 100,2) & "%</p>  </td> "
 objfile.Writeline "   " & TableFormat1 & "  <h3>Availible memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & AvailableGB & " GB</p>  </td> </tr>"
 objfile.Writeline " <tr>  " & TableFormat1 & "  <h3>Commit Limit:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommitLimit & " GB</p>  </td> "
 objfile.Writeline "  " & TableFormat1 & "  <h3>Committed memory:</h3>  </td>  " & TableFormat2  & "  <p class=MsoNormal>" & CommittedGB & " GB</p>  </td> </tr>"
